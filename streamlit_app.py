@@ -5,7 +5,7 @@ from PIL import Image
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-# Set page configuration
+# Page Configuration
 st.set_page_config(
     page_title="Cognitive Score Predictor",
     page_icon="🧠",
@@ -13,62 +13,64 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Define IT-themed color palette
-primary_color = "#0078D7"  # Microsoft blue
-secondary_color = "#106EBE"  # Darker blue
-accent_color = "#2B88D8"  # Light blue
-background_color = "#F5F5F5"  # Light gray
-text_color = "#333333"  # Dark gray
-success_color = "#107C10"  # Green
-warning_color = "#D83B01"  # Orange
+# IT-themed Color Palette
+primary_color = "#0078D7"
+secondary_color = "#106EBE"
+accent_color = "#2B88D8"
+background_color = "#F5F5F5"
+text_color = "#333333"
 
-# Custom CSS for IT theme
+# Custom CSS
 st.markdown(f"""
 <style>
-    .main .block-container {{
-        padding-top: 2rem;
-        padding-bottom: 2rem;
+    body {{
+        background-color: {background_color};
+        color: {text_color};
     }}
-    h1, h2, h3, h4, h5, h6 {{
+    .main .block-container {{
+        padding: 2rem;
+        font-family: "Segoe UI", sans-serif;
+    }}
+    h1, h2, h3 {{
         color: {primary_color};
+        font-weight: 700;
     }}
     .stButton>button {{
         background-color: {primary_color};
         color: white;
+        border-radius: 10px;
+        padding: 0.5rem 1.2rem;
+        font-size: 1rem;
+        box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
     }}
     .stButton>button:hover {{
         background-color: {secondary_color};
+        transition: 0.3s ease-in-out;
     }}
-    .stProgress .st-bo {{
-        background-color: {accent_color};
+    .css-1v3fvcr, .css-1d391kg {{
+        border: 1px solid {accent_color};
+        border-radius: 1rem;
+        padding: 1.2rem;
+        background-color: #ffffff;
+        box-shadow: 2px 2px 12px rgba(0,0,0,0.05);
+        margin-bottom: 1rem;
     }}
     .sidebar .sidebar-content {{
         background-color: {background_color};
     }}
-    .css-145kmo2 {{
-        border: 2px solid {accent_color};
-        border-radius: 0.5rem;
-        padding: 1rem;
-        margin-bottom: 1rem;
-    }}
 </style>
 """, unsafe_allow_html=True)
 
-# App title and description
+# Title
 st.title("🧠 Cognitive Score Predictor")
-st.markdown("""
-This application predicts cognitive performance scores based on various lifestyle and health factors.
-Enter your information below to get a prediction of your cognitive score.
-""")
+st.markdown("Predict your cognitive score based on lifestyle and mental performance indicators.")
 
-# Load a small sample of the dataset for reference
+# Load Data (fallback to dummy if not found)
 try:
     sample_data = pd.read_csv('/home/ubuntu/cognitive_app/data_subset.csv')
     has_sample_data = True
 except:
-    # If the file doesn't exist, create a simple reference dataset
     has_sample_data = False
-    # Create a simple reference dataset with reasonable ranges
     sample_data = pd.DataFrame({
         'Age': [18, 59],
         'Sleep_Duration': [4.0, 10.0],
@@ -79,222 +81,143 @@ except:
         'Memory_Test_Score': [40, 100]
     })
 
-# Sidebar for inputs
-st.sidebar.header("User Information")
+# Sidebar Inputs
+st.sidebar.header("🧾 Your Inputs")
 
-# Create input fields
-with st.sidebar:
-    # Personal Information
-    st.subheader("Personal Information")
-    age = st.slider("Age", min_value=18, max_value=59, value=30, 
-                   help="Age in years")
-    
-    gender = st.selectbox("Gender", options=["Male", "Female", "Other"], 
-                         help="Gender")
-    
-    # Lifestyle Factors
-    st.subheader("Lifestyle Factors")
-    sleep_duration = st.slider("Sleep Duration (hours)", 
-                              min_value=4.0, max_value=10.0, value=7.0, step=0.1,
-                              help="Average sleep duration in hours per day")
-    
-    stress_level = st.slider("Stress Level", 
-                            min_value=1, max_value=10, value=5,
-                            help="Stress level on a scale of 1-10 (1: very low, 10: very high)")
-    
-    diet_type = st.selectbox("Diet Type", 
-                            options=["Non-Vegetarian", "Vegetarian", "Vegan"],
-                            help="Primary diet type")
-    
-    daily_screen_time = st.slider("Daily Screen Time (hours)", 
-                                 min_value=1.0, max_value=12.0, value=6.0, step=0.1,
-                                 help="Average screen time in hours per day")
-    
-    exercise_frequency = st.selectbox("Exercise Frequency", 
-                                     options=["Low", "Medium", "High"],
-                                     help="How often you exercise")
-    
-    caffeine_intake = st.slider("Caffeine Intake (mg)", 
-                               min_value=0, max_value=500, value=150,
-                               help="Daily caffeine intake in milligrams")
-    
-    # Cognitive Metrics
-    st.subheader("Cognitive Metrics")
-    reaction_time = st.slider("Reaction Time (ms)", 
-                             min_value=200.0, max_value=600.0, value=350.0, step=0.1,
-                             help="Reaction time in milliseconds (lower is better)")
-    
-    memory_test_score = st.slider("Memory Test Score", 
-                                 min_value=40, max_value=100, value=70,
-                                 help="Memory test score out of 100")
+with st.sidebar.expander("👤 Personal Information", expanded=True):
+    age = st.slider("Age", 18, 59, 30)
+    gender = st.selectbox("Gender", ["Male", "Female", "Other"])
 
-# Main content area
-col1, col2 = st.columns([2, 1])
+with st.sidebar.expander("💬 Lifestyle Factors", expanded=True):
+    sleep_duration = st.slider("Sleep Duration (hrs)", 4.0, 10.0, 7.0, 0.1)
+    stress_level = st.slider("Stress Level (1-10)", 1, 10, 5)
+    diet_type = st.selectbox("Diet Type", ["Non-Vegetarian", "Vegetarian", "Vegan"])
+    daily_screen_time = st.slider("Screen Time (hrs)", 1.0, 12.0, 6.0, 0.1)
+    exercise_frequency = st.selectbox("Exercise Frequency", ["Low", "Medium", "High"])
+    caffeine_intake = st.slider("Caffeine Intake (mg)", 0, 500, 150)
+
+with st.sidebar.expander("🧠 Cognitive Metrics", expanded=True):
+    reaction_time = st.slider("Reaction Time (ms)", 200.0, 600.0, 350.0, 0.1)
+    memory_test_score = st.slider("Memory Test Score", 40, 100, 70)
+
+# Prediction Function
+def predict_cognitive_score(age, gender, sleep_duration, stress_level, diet_type,
+                            daily_screen_time, exercise_frequency, caffeine_intake,
+                            reaction_time, memory_test_score):
+    gender_factor = {'Male': 0, 'Female': 0, 'Other': 0}
+    diet_factor = {'Non-Vegetarian': 0, 'Vegetarian': 0.5, 'Vegan': 1}
+    exercise_factor = {'Low': 0, 'Medium': 0.5, 'High': 1}
+    
+    age_norm = 1 - ((age - 18) / (59 - 18))
+    sleep_quality = 1 - abs(sleep_duration - 8) / 4
+    stress_impact = 1 - (stress_level / 10)
+    screen_impact = 1 - (daily_screen_time / 12)
+    caffeine_impact = 1 - (abs(caffeine_intake - 200) / 300)
+    reaction_impact = 1 - ((reaction_time - 200) / 400)
+    memory_impact = memory_test_score / 100
+
+    score = (
+        0.10 * age_norm +
+        0.15 * sleep_quality +
+        0.15 * stress_impact +
+        0.05 * diet_factor[diet_type] +
+        0.10 * screen_impact +
+        0.15 * exercise_factor[exercise_frequency] +
+        0.05 * caffeine_impact +
+        0.10 * reaction_impact +
+        0.15 * memory_impact
+    )
+    
+    return max(0, min(100, score * 100))
+
+# Layout Columns
+col1, col2 = st.columns([2, 1], gap="large")
 
 with col1:
-    st.header("Prediction")
+    st.header("🔍 Prediction")
+    st.markdown("Click the button below to compute your cognitive score.")
     
-    # Create a prediction function (simplified model)
-    def predict_cognitive_score(age, gender, sleep_duration, stress_level, diet_type, 
-                               daily_screen_time, exercise_frequency, caffeine_intake,
-                               reaction_time, memory_test_score):
-        """
-        A simplified prediction model based on general cognitive science principles.
-        This is a placeholder for the actual trained model.
-        """
-        # Convert categorical variables to numeric
-        gender_factor = {'Male': 0, 'Female': 0, 'Other': 0}
-        diet_factor = {'Non-Vegetarian': 0, 'Vegetarian': 0.5, 'Vegan': 1}
-        exercise_factor = {'Low': 0, 'Medium': 0.5, 'High': 1}
-        
-        # Normalize inputs (simplified)
-        age_norm = 1 - ((age - 18) / (59 - 18))  # Younger is better for cognitive performance
-        sleep_quality = 1 - abs(sleep_duration - 8) / 4  # Optimal sleep around 8 hours
-        stress_impact = 1 - (stress_level / 10)  # Lower stress is better
-        screen_impact = 1 - (daily_screen_time / 12)  # Less screen time is better
-        caffeine_impact = 1 - (abs(caffeine_intake - 200) / 300)  # Moderate caffeine is optimal
-        reaction_impact = 1 - ((reaction_time - 200) / 400)  # Faster reaction time is better
-        memory_impact = memory_test_score / 100  # Higher memory score is better
-        
-        # Combine factors with weights
-        score = (
-            0.10 * age_norm +
-            0.15 * sleep_quality +
-            0.15 * stress_impact +
-            0.05 * diet_factor[diet_type] +
-            0.10 * screen_impact +
-            0.15 * exercise_factor[exercise_frequency] +
-            0.05 * caffeine_impact +
-            0.10 * reaction_impact +
-            0.15 * memory_impact
-        )
-        
-        # Scale to 0-100 range
-        return max(0, min(100, score * 100))
-    
-    if st.button("Predict Cognitive Score", key="predict_button"):
-        # Calculate prediction
+    if st.button("Predict Cognitive Score"):
         prediction = predict_cognitive_score(
             age, gender, sleep_duration, stress_level, diet_type,
             daily_screen_time, exercise_frequency, caffeine_intake,
             reaction_time, memory_test_score
         )
         
-        # Display prediction with gauge chart
-        st.subheader("Your Predicted Cognitive Score")
-        
-        # Create a gauge chart
+        st.subheader("🎯 Your Predicted Score")
         fig, ax = plt.subplots(figsize=(10, 5), subplot_kw={'projection': 'polar'})
-        
-        # Gauge settings
-        gauge_min, gauge_max = 0, 100
         theta = np.linspace(np.pi/2, -np.pi/2, 100)
-        
-        # Background colors for gauge (green to red)
         cmap = plt.cm.RdYlGn_r
-        norm = plt.Normalize(gauge_min, gauge_max)
-        colors = cmap(norm(np.linspace(gauge_min, gauge_max, 100)))
-        
-        # Draw the gauge background
+        norm = plt.Normalize(0, 100)
+        colors = cmap(norm(np.linspace(0, 100, 100)))
         ax.barh(0, 1, left=theta, height=0.1, color=colors)
-        
-        # Calculate the position for the needle
-        needle_theta = np.pi/2 - prediction/gauge_max * np.pi
-        
-        # Draw the needle
+        needle_theta = np.pi/2 - prediction/100 * np.pi
         ax.plot([0, needle_theta], [0, 0.8], 'k-', lw=3)
         ax.plot([needle_theta], [0.8], 'ko', ms=10)
-        
-        # Set the limits and remove unnecessary elements
         ax.set_ylim(0, 1)
         ax.set_frame_on(False)
         ax.axes.get_yaxis().set_visible(False)
-        
-        # Add labels
-        for i, score in enumerate([0, 25, 50, 75, 100]):
-            angle = np.pi/2 - (score/gauge_max * np.pi)
+        for score in [0, 25, 50, 75, 100]:
+            angle = np.pi/2 - (score/100 * np.pi)
             ax.text(angle, 0.85, f"{score}", ha='center', va='center', fontsize=12, fontweight='bold')
-        
-        # Add the score in the center
         ax.text(0, -0.2, f"{prediction:.1f}", ha='center', va='center', fontsize=30, fontweight='bold')
         ax.text(0, -0.35, "Cognitive Score", ha='center', va='center', fontsize=14)
-        
         st.pyplot(fig)
         
         # Interpretation
-        st.subheader("Interpretation")
+        st.subheader("📌 Interpretation")
         if prediction >= 80:
-            st.success(f"Excellent cognitive performance score of {prediction:.1f}! Your lifestyle factors are supporting optimal brain function.")
+            st.success(f"Excellent cognitive score of {prediction:.1f}!")
         elif prediction >= 60:
-            st.info(f"Good cognitive performance score of {prediction:.1f}. There's room for improvement in some lifestyle factors.")
+            st.info(f"Good cognitive score of {prediction:.1f}.")
         elif prediction >= 40:
-            st.warning(f"Moderate cognitive performance score of {prediction:.1f}. Consider adjusting several lifestyle factors for better cognitive health.")
+            st.warning(f"Moderate score of {prediction:.1f}.")
         else:
-            st.error(f"Low cognitive performance score of {prediction:.1f}. Multiple lifestyle factors may be negatively impacting your cognitive function.")
-        
+            st.error(f"Low cognitive score of {prediction:.1f}.")
+
         # Recommendations
-        st.subheader("Recommendations for Improvement")
-        recommendations = []
-        
+        st.subheader("🛠 Recommendations")
+        recs = []
         if sleep_duration < 7 or sleep_duration > 9:
-            recommendations.append("Aim for 7-9 hours of quality sleep per night.")
-        
+            recs.append("Sleep 7–9 hours per night.")
         if stress_level > 6:
-            recommendations.append("Consider stress reduction techniques like meditation or mindfulness.")
-        
+            recs.append("Reduce stress with meditation or exercise.")
         if daily_screen_time > 8:
-            recommendations.append("Reduce screen time and take regular breaks from digital devices.")
-        
+            recs.append("Limit screen time to under 8 hours daily.")
         if exercise_frequency == "Low":
-            recommendations.append("Increase physical activity - aim for at least 150 minutes of moderate exercise per week.")
-        
+            recs.append("Increase physical activity (e.g., 30 mins/day).")
         if caffeine_intake > 400:
-            recommendations.append("Reduce caffeine intake to below 400mg per day.")
-        
+            recs.append("Reduce caffeine below 400 mg/day.")
         if reaction_time > 450:
-            recommendations.append("Practice brain training games to improve reaction time.")
-        
+            recs.append("Play focus and reflex games.")
         if memory_test_score < 60:
-            recommendations.append("Engage in memory exercises and learning new skills to boost memory performance.")
-        
-        if recommendations:
-            for i, rec in enumerate(recommendations, 1):
-                st.write(f"{i}. {rec}")
+            recs.append("Practice memory-enhancing activities.")
+        if recs:
+            for i, r in enumerate(recs, 1):
+                st.markdown(f"{i}. {r}")
         else:
-            st.write("Your current lifestyle is well-balanced for cognitive health. Keep it up!")
+            st.markdown("Your lifestyle appears optimal! 🎉")
 
 with col2:
-    st.header("About Cognitive Scores")
-    
+    st.header("📘 About Cognitive Scores")
     st.markdown("""
-    ### What is a Cognitive Score?
-    
-    A cognitive score is a measure of your brain's performance across various domains including:
+    A cognitive score estimates your brain's performance in areas like:
     
     - Memory and recall
+    - Focus and attention
     - Processing speed
-    - Attention and focus
-    - Problem-solving ability
-    - Decision-making capacity
+    - Problem-solving
     
-    ### Key Factors Affecting Cognitive Performance
-    
-    **Sleep Quality**: Sleep is essential for memory consolidation and cognitive function.
-    
-    **Stress Levels**: Chronic stress can impair attention, memory, and decision-making.
-    
-    **Physical Activity**: Regular exercise improves blood flow to the brain and promotes neuroplasticity.
-    
-    **Diet**: Nutrition plays a crucial role in brain health and cognitive performance.
-    
-    **Screen Time**: Excessive screen time may impact attention and sleep quality.
-    
-    **Caffeine**: Moderate caffeine consumption can enhance alertness, but excessive amounts may increase anxiety.
+    ### Factors That Influence Scores:
+    - **Sleep**: Impacts memory and restoration.
+    - **Stress**: Chronic stress reduces focus.
+    - **Diet & Caffeine**: Fuels or hinders mental clarity.
+    - **Exercise**: Supports brain plasticity.
+    - **Screen Time**: Impacts attention and sleep.
     """)
-    
-    # Display a sample distribution if data is available
+
     if has_sample_data and 'Cognitive_Score' in sample_data.columns:
-        st.subheader("Sample Distribution of Cognitive Scores")
+        st.subheader("Sample Distribution")
         fig, ax = plt.subplots(figsize=(8, 4))
         sns.histplot(sample_data['Cognitive_Score'], kde=True, ax=ax)
         ax.set_xlabel('Cognitive Score')
@@ -304,12 +227,10 @@ with col2:
 # Footer
 st.markdown("""
 ---
-### How to Use This Predictor
+#### 📋 Instructions:
+1. Fill in your details on the sidebar.
+2. Click **Predict Cognitive Score**.
+3. View your score, interpretation, and suggestions.
 
-1. Enter your personal information and lifestyle factors in the sidebar
-2. Click the "Predict Cognitive Score" button
-3. Review your predicted score and recommendations
-4. Make lifestyle adjustments to improve your cognitive performance
-
-*Note: This is a simplified model for educational purposes. For medical advice, please consult healthcare professionals.*
+> *Note: This tool is for educational purposes. Please consult a healthcare provider for clinical assessments.*
 """)
