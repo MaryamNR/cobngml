@@ -62,7 +62,7 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 # Title
-st.title("🧠 Cognitive Score Predictor")
+st.title("🧠 Cognitive Score Predictor - Maryam")
 st.markdown("Predict your cognitive score based on lifestyle and mental performance indicators.")
 
 # Load Data (fallback to dummy if not found)
